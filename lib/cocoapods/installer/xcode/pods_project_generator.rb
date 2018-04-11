@@ -108,8 +108,8 @@ module Pod
             next unless share_scheme_for_development_pod?(pod_target.pod_name)
             Xcodeproj::XCScheme.share_scheme(project.path, pod_target.label)
             if pod_target.contains_test_specifications?
-              pod_target.supported_test_types.each do |test_type|
-                Xcodeproj::XCScheme.share_scheme(project.path, pod_target.test_target_label(test_type))
+              pod_target.test_specs.each do |test_spec|
+                Xcodeproj::XCScheme.share_scheme(project.path, pod_target.test_target_label(test_spec))
               end
             end
           end
@@ -326,8 +326,11 @@ module Pod
                 test_dependent_targets = test_specs.flat_map { |s| pod_target.test_dependent_targets_by_spec_name[s.name] }.compact.unshift(pod_target).uniq
                 test_dependent_targets.each do |test_dependent_target|
                   dependency_installation_result = pod_target_installation_results_hash[test_dependent_target.name]
-                  dependency_installation_result.test_resource_bundle_targets.values.flatten.each do |test_resource_bundle_target|
-                    test_native_target.add_dependency(test_resource_bundle_target)
+                  resource_bundle_native_targets = dependency_installation_result.test_resource_bundle_targets[test_specs.first.name]
+                  unless resource_bundle_native_targets.nil?
+                    resource_bundle_native_targets.each do |test_resource_bundle_target|
+                      test_native_target.add_dependency(test_resource_bundle_target)
+                    end
                   end
                   test_native_target.add_dependency(dependency_installation_result.native_target)
                   add_framework_file_reference_to_native_target(test_native_target, pod_target, test_dependent_target, frameworks_group)

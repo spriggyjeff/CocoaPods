@@ -25,8 +25,8 @@ module Pod
           def integrate!
             UI.section(integration_message) do
               target_installation_result.test_specs_by_native_target.each do |test_native_target, test_specs|
-                add_embed_frameworks_script_phase(test_native_target)
-                add_copy_resources_script_phase(test_native_target)
+                add_embed_frameworks_script_phase(test_native_target, test_specs.first)
+                add_copy_resources_script_phase(test_native_target, test_specs.first)
                 UserProjectIntegrator::TargetIntegrator.create_or_update_user_script_phases(script_phases_for_specs(test_specs), test_native_target)
               end
               specs = target.non_test_specs
@@ -49,10 +49,9 @@ module Pod
           #
           # @return [void]
           #
-          def add_copy_resources_script_phase(native_target)
-            test_type = target.test_type_for_product_type(native_target.symbol_type)
-            script_path = "${PODS_ROOT}/#{target.copy_resources_script_path_for_test_type(test_type).relative_path_from(target.sandbox.root)}"
-            resource_paths = target.all_dependent_targets.flat_map do |dependent_target|
+          def add_copy_resources_script_phase(native_target, test_spec)
+            script_path = "${PODS_ROOT}/#{target.copy_resources_script_path_for_test_spec(test_spec).relative_path_from(target.sandbox.root)}"
+            resource_paths = target.dependent_targets_for_test_spec(test_spec).flat_map do |dependent_target|
               spec_paths_to_include = dependent_target == target ? dependent_target.specs.map(&:name) : dependent_target.non_test_specs.map(&:name)
               dependent_target.resource_paths.values_at(*spec_paths_to_include).flatten.compact
             end
@@ -71,10 +70,9 @@ module Pod
           #
           # @return [void]
           #
-          def add_embed_frameworks_script_phase(native_target)
-            test_type = target.test_type_for_product_type(native_target.symbol_type)
-            script_path = "${PODS_ROOT}/#{target.embed_frameworks_script_path_for_test_type(test_type).relative_path_from(target.sandbox.root)}"
-            framework_paths = target.all_dependent_targets.flat_map do |dependent_target|
+          def add_embed_frameworks_script_phase(native_target, test_spec)
+            script_path = "${PODS_ROOT}/#{target.embed_frameworks_script_path_for_test_spec(test_spec).relative_path_from(target.sandbox.root)}"
+            framework_paths = target.dependent_targets_for_test_spec(test_spec).flat_map do |dependent_target|
               spec_paths_to_include = dependent_target == target ? dependent_target.specs.map(&:name) : dependent_target.non_test_specs.map(&:name)
               dependent_target.framework_paths.values_at(*spec_paths_to_include).flatten.compact.uniq
             end
