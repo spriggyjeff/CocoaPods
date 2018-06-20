@@ -88,7 +88,12 @@ module Pod
       # @return [Array<Pathname>]
       #
       def glob(patterns, options = {})
-        relative_glob(patterns, options).map { |p| root.join(p) }
+        cache_key = options.merge(:patterns => patterns)
+        cached_value = @glob_cache[cache_key]
+        return cached_value if cached_value
+        relative_glob(patterns, options).map { |p| root.join(p) }.tap do |list|
+          @glob_cache[cache_key] = list
+        end
       end
 
       # The list of relative paths that are case insensitively matched by a
@@ -114,10 +119,6 @@ module Pod
       #
       def relative_glob(patterns, options = {})
         return [] if patterns.empty?
-
-        cache_key = options.merge(:patterns => patterns)
-        cached_value = @glob_cache[cache_key]
-        return cached_value if cached_value
 
         dir_pattern = options[:dir_pattern]
         exclude_patterns = options[:exclude_patterns]
@@ -155,7 +156,7 @@ module Pod
           exclude_options = { :dir_pattern => '**/*', :include_dirs => include_dirs }
           list -= relative_glob(exclude_patterns, exclude_options)
         end
-        @glob_cache[cache_key] = list
+        list
       end
 
       #-----------------------------------------------------------------------#
