@@ -435,6 +435,8 @@ module Pod
     end
     private :_add_recursive_test_dependent_targets
 
+    # @param [Specification] test_spec
+    #
     # @return [Array<PodTarget>] the canonical list of dependent targets this target has a dependency upon.
     #         This list includes the target itself as well as its recursive dependent and test dependent targets.
     #
