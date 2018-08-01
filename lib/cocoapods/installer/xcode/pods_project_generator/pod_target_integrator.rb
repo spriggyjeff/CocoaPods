@@ -25,8 +25,10 @@ module Pod
           def integrate!
             UI.section(integration_message) do
               target_installation_result.test_specs_by_native_target.each do |test_native_target, test_specs|
-                add_embed_frameworks_script_phase(test_native_target, test_specs.first)
-                add_copy_resources_script_phase(test_native_target, test_specs.first)
+                test_specs.each do |test_spec|
+                  add_embed_frameworks_script_phase(test_native_target, test_spec)
+                  add_copy_resources_script_phase(test_native_target, test_spec)
+                end
                 UserProjectIntegrator::TargetIntegrator.create_or_update_user_script_phases(script_phases_for_specs(test_specs), test_native_target)
               end
               specs = target.non_test_specs
