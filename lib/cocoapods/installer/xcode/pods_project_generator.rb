@@ -335,7 +335,7 @@ module Pod
                   test_native_target.add_dependency(dependency_installation_result.native_target)
                   add_framework_file_reference_to_native_target(test_native_target, pod_target, test_dependent_target, frameworks_group)
                   # Wire app host dependencies to test native target
-                  test_spec_consumers = test_specs.map {|test_spec| test_spec.consumer(pod_target.platform)}
+                  test_spec_consumers = test_specs.map { |test_spec| test_spec.consumer(pod_target.platform) }
                   test_spec_consumers.select(&:requires_app_host?).each do |test_spec_consumer|
                     app_host_target = app_hosts_by_host_key[AppHostKey.new(test_spec_consumer.test_type, pod_target.platform)]
                     test_native_target.add_dependency(app_host_target)

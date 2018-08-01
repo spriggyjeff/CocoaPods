@@ -54,9 +54,8 @@ module Pod
           def add_copy_resources_script_phase(native_target, test_spec)
             script_path = "${PODS_ROOT}/#{target.copy_resources_script_path_for_test_spec(test_spec).relative_path_from(target.sandbox.root)}"
             resource_paths = target.dependent_targets_for_test_spec(test_spec).flat_map do |dependent_target|
-              spec_paths_to_include = dependent_target == target ?
-                                          dependent_target.specs_without_test_specs(test_spec).map(&:name) :
-                                          dependent_target.non_test_specs.map(&:name)
+              spec_paths_to_include = dependent_target.non_test_specs.map(&:name)
+              spec_paths_to_include << test_spec.name if dependent_target == target
               dependent_target.resource_paths.values_at(*spec_paths_to_include).flatten.compact
             end
             input_paths = []
@@ -77,9 +76,8 @@ module Pod
           def add_embed_frameworks_script_phase(native_target, test_spec)
             script_path = "${PODS_ROOT}/#{target.embed_frameworks_script_path_for_test_spec(test_spec).relative_path_from(target.sandbox.root)}"
             framework_paths = target.dependent_targets_for_test_spec(test_spec).flat_map do |dependent_target|
-              spec_paths_to_include = dependent_target == target ?
-                                          dependent_target.specs_without_test_specs(test_spec).map(&:name) :
-                                          dependent_target.non_test_specs.map(&:name)
+              spec_paths_to_include = dependent_target.non_test_specs.map(&:name)
+              spec_paths_to_include << test_spec.name if dependent_target == target
               dependent_target.framework_paths.values_at(*spec_paths_to_include).flatten.compact.uniq
             end
             input_paths = []

@@ -305,7 +305,6 @@ module Pod
       end
     end
 
-
     # @return [Specification] The root specification for the target.
     #
     def root_spec
@@ -353,7 +352,7 @@ module Pod
     # @return [String] The derived name of the test target.
     #
     def test_target_label(test_spec)
-      # TODO do not use base_name here
+      # TODO: do not use base_name here
       "#{label}-#{test_spec.test_type.capitalize}-#{test_spec.base_name}"
     end
 
@@ -517,21 +516,6 @@ module Pod
         header_search_paths.concat(sandbox.public_headers.search_paths(platform, dependent_target.pod_name, defines_module? && dependent_target.uses_modular_headers?(false)))
       end
       header_search_paths.uniq
-    end
-
-    # Returns specs that aren't test specs.
-    # Optionally allows specifying a test spec that will be included in the output.
-    #
-    # @param [Specification] test_spec_to_include
-    #        Optional test spec to include in the output
-    #
-    # @return [Array<Specification>]
-    #         Array of specifications that aren't test specs
-    #
-    def specs_without_test_specs(test_spec_to_include = nil)
-      specs.select do |spec|
-        !spec.test_specification? || spec == test_spec_to_include
-      end
     end
 
     protected
