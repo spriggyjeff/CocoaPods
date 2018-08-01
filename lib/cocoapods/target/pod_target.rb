@@ -519,6 +519,21 @@ module Pod
       header_search_paths.uniq
     end
 
+    # Returns specs that aren't test specs.
+    # Optionally allows specifying a test spec that will be included in the output.
+    #
+    # @param [Specification] test_spec_to_include
+    #        Optional test spec to include in the output
+    #
+    # @return [Array<Specification>]
+    #         Array of specifications that aren't test specs
+    #
+    def specs_without_test_specs(test_spec_to_include = nil)
+      specs.select do |spec|
+        !spec.test_specification? || spec == test_spec_to_include
+      end
+    end
+
     protected
 
     # Returns whether the pod target should use modular headers.
