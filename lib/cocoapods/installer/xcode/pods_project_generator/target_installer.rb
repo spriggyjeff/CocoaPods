@@ -163,7 +163,7 @@ module Pod
               linked_path = target.module_map_path
               if path != linked_path
                 linked_path.dirname.mkpath
-                FileUtils.ln_sf(path, linked_path)
+                FileUtils.ln_sf(path.relative_path_from(linked_path.dirname), linked_path)
               end
 
               relative_path_string = target.module_map_path.relative_path_from(sandbox.root).to_s
@@ -199,7 +199,7 @@ module Pod
               linked_path = target.umbrella_header_path
               if path != linked_path
                 linked_path.dirname.mkpath
-                FileUtils.ln_sf(path, linked_path)
+                FileUtils.ln_sf(path.relative_path_from(linked_path.dirname), linked_path)
               end
 
               acl = target.requires_frameworks? ? 'Public' : 'Project'
